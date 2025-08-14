@@ -34,14 +34,19 @@ Ce plugin résout ce problème en désactivant uniquement cette règle spécifiq
        - exec:
            cd: $home/plugins
            cmd:
-             - git clone https://github.com/cadgeneration/discourse-no-indented-code.git
+             - git clone https://github.com/CTZen78/discourse-no-indented-code.git
    ```
 
 3. Reconstruisez votre instance :
    ```bash
    ./launcher rebuild app
    ```
-
+4. Reconstruisez les messages :
+   ```bash
+   ./launcher enter app
+   rake posts:rebake
+   ```
+   
 ## Vérification du fonctionnement
 
 Après l'installation, testez le plugin en créant un nouveau post avec du texte indenté :
@@ -90,4 +95,5 @@ Ce plugin est distribué sous licence MIT. Voir le fichier LICENSE pour plus de 
 - Désactivation de la règle de code par indentation
 - Préservation des autres fonctionnalités Markdown
 - Support multi-versions de Discourse
+
 
