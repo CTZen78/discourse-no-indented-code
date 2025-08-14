@@ -22,34 +22,6 @@ Ce plugin résout ce problème en désactivant uniquement cette règle spécifiq
 
 ## Installation
 
-### 1. Via l'interface d'administration Discourse
-
-1. Connectez-vous en tant qu'administrateur sur votre instance Discourse
-2. Allez dans **Administration > Plugins**
-3. Cliquez sur **Install Plugin**
-4. Entrez l'URL du repository : `https://github.com/cadgeneration/discourse-no-indented-code`
-5. Cliquez sur **Install**
-6. Redémarrez votre instance Discourse
-
-### 2. Installation manuelle
-
-1. Connectez-vous à votre serveur Discourse via SSH
-2. Naviguez vers le dossier des plugins :
-   ```bash
-   cd /var/discourse/containers/app/plugins/
-   ```
-3. Clonez ce repository :
-   ```bash
-   git clone https://github.com/cadgeneration/discourse-no-indented-code.git
-   ```
-4. Reconstruisez votre instance Discourse :
-   ```bash
-   cd /var/discourse
-   ./launcher rebuild app
-   ```
-
-### 3. Via app.yml (recommandé pour la production)
-
 1. Éditez le fichier `app.yml` de votre instance Discourse :
    ```bash
    nano /var/discourse/containers/app.yml
@@ -118,3 +90,4 @@ Ce plugin est distribué sous licence MIT. Voir le fichier LICENSE pour plus de 
 - Désactivation de la règle de code par indentation
 - Préservation des autres fonctionnalités Markdown
 - Support multi-versions de Discourse
+
