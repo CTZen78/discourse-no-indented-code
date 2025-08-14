@@ -20,13 +20,13 @@ after_initialize do
         # (pas de classe de langage, contenu simple)
         parent_pre = code_block.parent
         if parent_pre && parent_pre.name == 'pre' && !code_block['class']
-          # Récupérer le contenu du bloc
+          # Récupérer le contenu du bloc tel quel
           content = code_block.inner_html
           
-          # Remplacer le bloc <pre><code> par un simple texte indenté
-          # en utilisant des espaces insécables pour préserver l'indentation
-          indented_content = content.gsub(/^/, '    ').gsub(/\n/, "\n    ")
-          replacement = "<div style='white-space: pre-wrap; margin-left: 2em;'>#{indented_content}</div>"
+          # Remplacer le bloc <pre><code> par un simple div avec indentation préservée
+          # Utiliser white-space: pre-wrap pour préserver les espaces et retours à la ligne
+          # Utiliser padding-left au lieu de margin-left pour plus de contrôle
+          replacement = "<div style='white-space: pre-wrap; padding-left: 1.5em; font-family: inherit;'>#{content}</div>"
           
           parent_pre.replace(replacement)
         end
