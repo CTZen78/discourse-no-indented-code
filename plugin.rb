@@ -6,30 +6,39 @@
 
 # Attendre que Discourse soit complètement initialisé avant de modifier le moteur Markdown
 after_initialize do
-  # Utiliser le système d'événements de Discourse pour intercepter et modifier
-  # la configuration du moteur Markdown au moment approprié
+  # Approche directe : Modifier le texte avant qu'il soit traité par Markdown
+  # Cette méthode intercepte le contenu brut avant le rendu
   
-  # Hook sur l'événement de création du contexte Markdown
-  # Cet événement se déclenche à chaque fois qu'un nouveau contexte Markdown est créé
-  DiscourseEvent.on(:markdown_context) do |context|
-    # Vérifier que nous avons accès à l'instance markdown-it
-    if context[:markdown_it]
-      # Désactiver la règle 'code' qui gère les blocs de code par indentation
-      # Cette règle convertit automatiquement le texte indenté avec 4 espaces ou une tabulation
-      # en blocs de code (<pre><code>)
-      context[:markdown_it].block.ruler.disable(['code'])
-      
-      Rails.logger.info("Plugin discourse-no-indented-code: Règle 'code' désactivée pour ce contexte")
+  # Hook dans le processus de pré-traitement du texte
+  on(:before_post_process_cooked) do |doc, post|
+    # Post-traitement : Nettoyer le HTML généré pour retirer les blocs de code d'indentation
+    if doc && doc.content
+      # Rechercher et remplacer les blocs <pre><code> générés par l'indentation
+      # Pattern: <pre><code>contenu sans langage spécifié</code></pre>
+      doc.css('pre > code:not([class])').each do |code_block|
+        # Vérifier si c'est probablement un bloc généré par indentation
+        # (pas de classe de langage, contenu simple)
+        parent_pre = code_block.parent
+        if parent_pre && parent_pre.name == 'pre' && !code_block['class']
+          # Récupérer le contenu du bloc
+          content = code_block.inner_html
+          
+          # Remplacer le bloc <pre><code> par un simple texte indenté
+          # en utilisant des espaces insécables pour préserver l'indentation
+          indented_content = content.gsub(/^/, '    ').gsub(/\n/, "\n    ")
+          replacement = "<div style='white-space: pre-wrap; margin-left: 2em;'>#{indented_content}</div>"
+          
+          parent_pre.replace(replacement)
+        end
+      end
     end
   end
   
-  # Approche alternative : modifier directement la configuration du moteur
-  # en utilisant le hook de pré-traitement
-  on(:reduce_cooked) do |fragment, post|
-    # Cette méthode est appelée après le rendu Markdown
-    # On peut l'utiliser pour vérifier que notre modification fonctionne
+  # Méthode alternative : Hook sur le texte brut avant traitement Markdown
+  DiscourseEvent.on(:before_post_process_cooked) do |doc, post|
+    Rails.logger.info("Plugin discourse-no-indented-code: Post-traitement appliqué au post #{post&.id}")
   end
   
   # Log de confirmation que le plugin est activé
-  Rails.logger.info("Plugin discourse-no-indented-code: Plugin activé avec succès")
+  Rails.logger.info("Plugin discourse-no-indented-code: Plugin activé avec succès - Mode post-traitement")
 end
